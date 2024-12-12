@@ -5,7 +5,16 @@
   "type": "module",
   "source": "src/index.ts",
   "main": "./lib/index.cjs",
-  "types": "lib/index.d.ts",
+  "module": "./lib/index.esm.js",
+  "types": "./lib/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./lib/index.esm.js",
+      "require": "./lib/index.cjs",
+      "types": "./lib/index.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
   "files": [
     "lib/**/*"
   ],
@@ -14,8 +23,8 @@
     "fmt": "prettier --write src",
     "fmt.check": "prettier --check src",
     "format": "pretty-quick",
-    "dev": "microbundle watch --no-sourcemap --compress=false",
-    "build": "rimraf lib && microbundle --no-sourcemap --compress=false",
+    "dev": "microbundle watch --no-sourcemap --compress=false --target node --external node --format esm,cjs",
+    "build": "rimraf lib && microbundle --no-sourcemap --compress=false --target node --external node --format esm,cjs",
     "dev-rv": "pnpm -filter 'examples-rust-vite*' run dev",
     "preview-rv": "pnpm -filter 'examples-rust-vite*' run preview",
     "dev-vv": "pnpm -filter 'examples-vite-vite*' run dev",

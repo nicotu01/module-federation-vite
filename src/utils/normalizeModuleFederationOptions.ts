@@ -21,6 +21,8 @@ export type RemoteEntryType =
   | 'system'
   | string;
 
+import { createRequire } from 'node:module';
+import { sep } from 'node:path';
 import * as path from 'pathe';
 import { warn } from './logUtils';
 
@@ -132,7 +134,9 @@ function normalizeShareItem(
 ): ShareItem {
   let version: string | undefined;
   try {
-    version = require(path.join(removePathFromNpmPackage(key), 'package.json')).version;
+    const _require = createRequire(process.cwd() + sep);
+
+    version = _require(path.join(removePathFromNpmPackage(key), 'package.json')).version;
   } catch (e) {
     console.log(e);
   }
@@ -327,6 +331,7 @@ export function normalizeModuleFederationOptions(
       `We are ignoring the getPublicPath options because they are natively supported by Vite\nwith the "experimental.renderBuiltUrl" configuration https://vitejs.dev/guide/build#advanced-base-options`
     );
   }
+  const _require = createRequire(process.cwd() + sep);
   return (config = {
     exposes: normalizeExposes(options.exposes),
     filename: options.filename || 'remoteEntry-[hash]',
@@ -338,7 +343,7 @@ export function normalizeModuleFederationOptions(
     shareScope: options.shareScope || 'default',
     shared: normalizeShared(options.shared),
     runtimePlugins: options.runtimePlugins || [],
-    implementation: options.implementation || require.resolve('@module-federation/runtime'),
+    implementation: options.implementation || _require.resolve('@module-federation/runtime'),
     manifest: normalizeManifest(options.manifest),
     dev: options.dev,
     dts: options.dts,
